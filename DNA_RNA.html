@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Nucleic Acid Models</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const LandingPage = ({ onSelectModel }) => {
+            return (
+                <div className="w-full h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-8 overflow-auto">
+                    <div className="max-w-6xl w-full fade-in">
+                        <div className="text-center mb-16">
+                            <h1 className="text-6xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                                Nucleic Acid Explorer
+                            </h1>
+                            <p className="text-xl text-slate-300">Explore the molecular structures of life in stunning 3D</p>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-8 mb-12">
+                            {/* DNA Card */}
+                            <div 
+                                onClick={() => onSelectModel('dna')}
+                                className="group cursor-pointer bg-gradient-to-br from-blue-900/40 to-blue-800/40 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/30 hover:border-blue-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30"
+                            >
+                                <div className="float">
+                                    <div className="text-7xl mb-6 text-center">🧬</div>
+                                </div>
+                                <h2 className="text-4xl font-bold text-white mb-4 text-center">DNA</h2>
+                                <p className="text-slate-300 text-center mb-6">
+                                    Deoxyribonucleic Acid
+                                </p>
+                                <ul className="space-y-2 text-slate-300 mb-6">
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Double helix structure</span>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Base pairs: A-T, C-G</span>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Stores genetic information</span>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Deoxyribose sugar backbone</span>
+                                    </li>
+                                </ul>
+                                <div className="text-center">
+                                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg group-hover:shadow-blue-500/50">
+                                        Explore DNA Model →
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* RNA Card */}
+                            <div 
+                                onClick={() => onSelectModel('rna')}
+                                className="group cursor-pointer bg-gradient-to-br from-purple-900/40 to-pink-800/40 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/30 hover:border-purple-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30"
+                            >
+                                <div className="float" style={{animationDelay: '0.5s'}}>
+                                    <div className="text-7xl mb-6 text-center">🔬</div>
+                                </div>
+                                <h2 className="text-4xl font-bold text-white mb-4 text-center">RNA</h2>
+                                <p className="text-slate-300 text-center mb-6">
+                                    Ribonucleic Acid
+                                </p>
+                                <ul className="space-y-2 text-slate-300 mb-6">
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Single-stranded helix</span>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Base pairs: A-U, C-G</span>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Protein synthesis messenger</span>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <span className="mr-2">✓</span>
+                                        <span>Ribose sugar backbone</span>
+                                    </li>
+                                </ul>
+                                <div className="text-center">
+                                    <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg group-hover:shadow-purple-500/50">
+                                        Explore RNA Model →
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Team Section */}
+                        <div className="mt-16 fade-in" style={{animationDelay: '0.3s'}}>
+                            <div className="bg-gradient-to-br from-slate-800/40 to-slate-700/40 backdrop-blur-lg rounded-2xl p-8 border border-slate-500/30">
+                                <h3 className="text-3xl font-bold text-white mb-6 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                                    Created By
+                                </h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <div className="bg-slate-700/50 rounded-xl p-4 text-center hover:bg-slate-600/50 transition-all hover:scale-105">
+                                        <div className="text-3xl mb-2">👨‍💻</div>
+                                        <p className="text-white font-semibold">Prince Maity</p>
+                                    </div>
+                                    <div className="bg-slate-700/50 rounded-xl p-4 text-center hover:bg-slate-600/50 transition-all hover:scale-105">
+                                        <div className="text-3xl mb-2">👨‍💻</div>
+                                        <p className="text-white font-semibold">Aarya Rishi Mondal</p>
+                                    </div>
+                                    <div className="bg-slate-700/50 rounded-xl p-4 text-center hover:bg-slate-600/50 transition-all hover:scale-105">
+                                        <div className="text-3xl mb-2">👨‍💻</div>
+                                        <p className="text-white font-semibold">Syed Abdullah</p>
+                                    </div>
+                                    <div className="bg-slate-700/50 rounded-xl p-4 text-center hover:bg-slate-600/50 transition-all hover:scale-105">
+                                        <div className="text-3xl mb-2">👩‍💻</div>
+                                        <p className="text-white font-semibold">Darsshinee S</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DNA3DModel = ({ onBack }) => {
+          const mountRef = useRef(null);
+          const [rotation, setRotation] = useState(true);
+          const [speed, setSpeed] = useState(0.003);
+          const [showLabels, setShowLabels] = useState(true);
+          const [colorScheme, setColorScheme] = useState('vibrant');
+          const sceneRef = useRef(null);
+          const cameraRef = useRef(null);
+          const rendererRef = useRef(null);
+          const dnaGroupRef = useRef(null);
+          const animationFrameRef = useRef(null);
+
+          useEffect(() => {
+            if (!mountRef.current) return;
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+            scene.fog = new THREE.Fog(0x0f172a, 30, 60);
+            sceneRef.current = scene;
+
+            const camera = new THREE.PerspectiveCamera(
+              50,
+              mountRef.current.clientWidth / mountRef.current.clientHeight,
+              0.1,
+              1000
+            );
+            camera.position.set(0, 0, 40);
+            cameraRef.current = camera;
+
+            const renderer = new THREE.WebGLRenderer({ 
+              antialias: true, 
+              preserveDrawingBuffer: true,
+              alpha: true 
+            });
+            renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            mountRef.current.appendChild(renderer.domElement);
+            rendererRef.current = renderer;
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            mainLight.position.set(10, 10, 10);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            scene.add(mainLight);
+
+            const fillLight1 = new THREE.PointLight(0x6366f1, 0.6);
+            fillLight1.position.set(-15, 5, 10);
+            scene.add(fillLight1);
+
+            const fillLight2 = new THREE.PointLight(0xec4899, 0.5);
+            fillLight2.position.set(15, -5, 10);
+            scene.add(fillLight2);
+
+            const backLight = new THREE.PointLight(0x8b5cf6, 0.4);
+            backLight.position.set(0, 0, -20);
+            scene.add(backLight);
+
+            const dnaGroup = new THREE.Group();
+            scene.add(dnaGroup);
+            dnaGroupRef.current = dnaGroup;
+
+            const helixHeight = 35;
+            const helixRadius = 4.5;
+            const basePairs = 25;
+
+            const sequence = [
+              'A', 'T', 'C', 'G', 'T', 'A', 'G', 'C', 'C', 'G', 
+              'A', 'T', 'T', 'A', 'C', 'G', 'G', 'C', 'A', 'T',
+              'G', 'C', 'A', 'T', 'C'
+            ];
+            const complement = { 'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C' };
+
+            const colorSchemes = {
+              vibrant: {
+                A: 0x10b981,
+                T: 0xef4444,
+                C: 0x3b82f6,
+                G: 0xfbbf24,
+                backbone: 0x94a3b8,
+                glow: true
+              },
+              neon: {
+                A: 0x00ff88,
+                T: 0xff0066,
+                C: 0x00ccff,
+                G: 0xffcc00,
+                backbone: 0x6366f1,
+                glow: true
+              },
+              professional: {
+                A: 0x059669,
+                T: 0xdc2626,
+                C: 0x2563eb,
+                G: 0xd97706,
+                backbone: 0x64748b,
+                glow: false
+              }
+            };
+
+            const getColors = (scheme) => colorSchemes[scheme] || colorSchemes.vibrant;
+
+            const createGlowMaterial = (color, glow) => {
+              if (glow) {
+                return new THREE.MeshPhongMaterial({
+                  color: color,
+                  emissive: color,
+                  emissiveIntensity: 0.3,
+                  shininess: 100,
+                  specular: 0x888888
+                });
+              }
+              return new THREE.MeshPhongMaterial({
+                color: color,
+                shininess: 80,
+                specular: 0x444444
+              });
+            };
+
+            const createDNA = (scheme) => {
+              while (dnaGroup.children.length > 0) {
+                const child = dnaGroup.children[0];
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                  if (Array.isArray(child.material)) {
+                    child.material.forEach(m => m.dispose());
+                  } else {
+                    child.material.dispose();
+                  }
+                }
+                dnaGroup.remove(child);
+              }
+
+              const colors = getColors(scheme);
+              const backboneGeometry = new THREE.SphereGeometry(0.35, 20, 20);
+              const backboneMaterial = new THREE.MeshPhongMaterial({
+                color: colors.backbone,
+                shininess: 90,
+                specular: 0x555555,
+                transparent: true,
+                opacity: 0.9
+              });
+
+              const baseGeometry = new THREE.SphereGeometry(0.6, 24, 24);
+
+              for (let i = 0; i < basePairs; i++) {
+                const angle = (i / basePairs) * Math.PI * 4;
+                const y = (i / basePairs) * helixHeight - helixHeight / 2;
+
+                const x1 = Math.cos(angle) * helixRadius;
+                const z1 = Math.sin(angle) * helixRadius;
+                const backbone1 = new THREE.Mesh(backboneGeometry, backboneMaterial);
+                backbone1.position.set(x1, y, z1);
+                backbone1.castShadow = true;
+                backbone1.receiveShadow = true;
+                dnaGroup.add(backbone1);
+
+                const x2 = Math.cos(angle + Math.PI) * helixRadius;
+                const z2 = Math.sin(angle + Math.PI) * helixRadius;
+                const backbone2 = new THREE.Mesh(backboneGeometry, backboneMaterial);
+                backbone2.position.set(x2, y, z2);
+                backbone2.castShadow = true;
+                backbone2.receiveShadow = true;
+                dnaGroup.add(backbone2);
+
+                if (i < basePairs - 1) {
+                  const nextAngle = ((i + 1) / basePairs) * Math.PI * 4;
+                  const nextY = ((i + 1) / basePairs) * helixHeight - helixHeight / 2;
+                  
+                  const x1Next = Math.cos(nextAngle) * helixRadius;
+                  const z1Next = Math.sin(nextAngle) * helixRadius;
+                  const x2Next = Math.cos(nextAngle + Math.PI) * helixRadius;
+                  const z2Next = Math.sin(nextAngle + Math.PI) * helixRadius;
+
+                  const tube1Geometry = createTube(
+                    new THREE.Vector3(x1, y, z1),
+                    new THREE.Vector3(x1Next, nextY, z1Next),
+                    0.18
+                  );
+                  const tube1 = new THREE.Mesh(tube1Geometry, backboneMaterial);
+                  tube1.castShadow = true;
+                  dnaGroup.add(tube1);
+
+                  const tube2Geometry = createTube(
+                    new THREE.Vector3(x2, y, z2),
+                    new THREE.Vector3(x2Next, nextY, z2Next),
+                    0.18
+                  );
+                  const tube2 = new THREE.Mesh(tube2Geometry, backboneMaterial);
+                  tube2.castShadow = true;
+                  dnaGroup.add(tube2);
+                }
+
+                const base1Type = sequence[i];
+                const base2Type = complement[base1Type];
+
+                const base1Material = createGlowMaterial(colors[base1Type], colors.glow);
+                const base2Material = createGlowMaterial(colors[base2Type], colors.glow);
+
+                const baseX1 = Math.cos(angle) * (helixRadius - 1.4);
+                const baseZ1 = Math.sin(angle) * (helixRadius - 1.4);
+                const base1 = new THREE.Mesh(baseGeometry, base1Material);
+                base1.position.set(baseX1, y, baseZ1);
+                base1.castShadow = true;
+                base1.receiveShadow = true;
+                dnaGroup.add(base1);
+
+                const baseX2 = Math.cos(angle + Math.PI) * (helixRadius - 1.4);
+                const baseZ2 = Math.sin(angle + Math.PI) * (helixRadius - 1.4);
+                const base2 = new THREE.Mesh(baseGeometry, base2Material);
+                base2.position.set(baseX2, y, baseZ2);
+                base2.castShadow = true;
+                base2.receiveShadow = true;
+                dnaGroup.add(base2);
+
+                const numBonds = (base1Type === 'A' || base1Type === 'T') ? 2 : 3;
+                for (let j = 0; j < numBonds; j++) {
+                  const offset = (j - (numBonds - 1) / 2) * 0.3;
+                  const bondStart = new THREE.Vector3(
+                    baseX1 + offset * Math.sin(angle),
+                    y,
+                    baseZ1 - offset * Math.cos(angle)
+                  );
+                  const bondEnd = new THREE.Vector3(
+                    baseX2 + offset * Math.sin(angle + Math.PI),
+                    y,
+                    baseZ2 - offset * Math.cos(angle + Math.PI)
+                  );
+                  
+                  const bondGeometry = createTube(bondStart, bondEnd, 0.06);
+                  const bondMaterial = new THREE.MeshPhongMaterial({
+                    color: 0xe2e8f0,
+                    transparent: true,
+                    opacity: 0.5,
+                    emissive: 0xffffff,
+                    emissiveIntensity: 0.1
+                  });
+                  const bond = new THREE.Mesh(bondGeometry, bondMaterial);
+                  dnaGroup.add(bond);
+                }
+
+                if (showLabels && i % 2 === 0) {
+                  const canvas1 = createTextCanvas(base1Type, colors[base1Type]);
+                  const texture1 = new THREE.CanvasTexture(canvas1);
+                  const labelMaterial1 = new THREE.SpriteMaterial({ 
+                    map: texture1,
+                    transparent: true
+                  });
+                  const label1 = new THREE.Sprite(labelMaterial1);
+                  label1.position.set(baseX1 * 1.4, y, baseZ1 * 1.4);
+                  label1.scale.set(1.8, 1.8, 1);
+                  dnaGroup.add(label1);
+
+                  const canvas2 = createTextCanvas(base2Type, colors[base2Type]);
+                  const texture2 = new THREE.CanvasTexture(canvas2);
+                  const labelMaterial2 = new THREE.SpriteMaterial({ 
+                    map: texture2,
+                    transparent: true
+                  });
+                  const label2 = new THREE.Sprite(labelMaterial2);
+                  label2.position.set(baseX2 * 1.4, y, baseZ2 * 1.4);
+                  label2.scale.set(1.8, 1.8, 1);
+                  dnaGroup.add(label2);
+                }
+              }
+
+              const arrowGeometry = new THREE.ConeGeometry(0.5, 1.5, 8);
+              const arrowMaterial = new THREE.MeshPhongMaterial({
+                color: 0xfbbf24,
+                emissive: 0xfbbf24,
+                emissiveIntensity: 0.3
+              });
+
+              const arrow1 = new THREE.Mesh(arrowGeometry, arrowMaterial);
+              arrow1.position.set(Math.cos(0) * helixRadius, helixHeight / 2 + 2, Math.sin(0) * helixRadius);
+              arrow1.rotation.x = Math.PI;
+              dnaGroup.add(arrow1);
+
+              const arrow2 = new THREE.Mesh(arrowGeometry, arrowMaterial);
+              arrow2.position.set(Math.cos(Math.PI) * helixRadius, -helixHeight / 2 - 2, Math.sin(Math.PI) * helixRadius);
+              dnaGroup.add(arrow2);
+            };
+
+            function createTube(start, end, radius) {
+              const direction = new THREE.Vector3().subVectors(end, start);
+              const length = direction.length();
+              const geometry = new THREE.CylinderGeometry(radius, radius, length, 12);
+              
+              const matrix = new THREE.Matrix4();
+              const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+              const quaternion = new THREE.Quaternion();
+              quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+              
+              matrix.makeRotationFromQuaternion(quaternion);
+              matrix.setPosition(midpoint);
+              geometry.applyMatrix4(matrix);
+              
+              return geometry;
+            }
+
+            function createTextCanvas(text, color) {
+              const canvas = document.createElement('canvas');
+              canvas.width = 256;
+              canvas.height = 256;
+              const context = canvas.getContext('2d');
+              
+              context.shadowColor = `#${color.toString(16).padStart(6, '0')}`;
+              context.shadowBlur = 20;
+              context.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+              context.font = 'Bold 160px Arial';
+              context.textAlign = 'center';
+              context.textBaseline = 'middle';
+              context.fillText(text, 128, 128);
+              
+              return canvas;
+            }
+
+            createDNA(colorScheme);
+
+            let mouseX = 0, mouseY = 0;
+            let targetRotationX = 0, targetRotationY = 0;
+            let currentRotationX = 0, currentRotationY = 0;
+
+            const onMouseMove = (event) => {
+              mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+              mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+              targetRotationX = mouseY * 0.3;
+              targetRotationY = mouseX * 0.5;
+            };
+
+            const onMouseWheel = (event) => {
+              event.preventDefault();
+              camera.position.z += event.deltaY * 0.1;
+              camera.position.z = Math.max(20, Math.min(60, camera.position.z));
+            };
+
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('wheel', onMouseWheel, { passive: false });
+
+            const animate = () => {
+              animationFrameRef.current = requestAnimationFrame(animate);
+              if (rotation) dnaGroup.rotation.y += speed;
+              
+              currentRotationX += (targetRotationX - currentRotationX) * 0.05;
+              currentRotationY += (targetRotationY - currentRotationY) * 0.05;
+              
+              dnaGroup.rotation.x = currentRotationX;
+              if (!rotation) dnaGroup.rotation.y = currentRotationY;
+
+              renderer.render(scene, camera);
+            };
+
+            animate();
+
+            const handleResize = () => {
+              if (!mountRef.current) return;
+              camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+              camera.updateProjectionMatrix();
+              renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+            };
+
+            window.addEventListener('resize', handleResize);
+
+            return () => {
+              window.removeEventListener('mousemove', onMouseMove);
+              window.removeEventListener('wheel', onMouseWheel);
+              window.removeEventListener('resize', handleResize);
+              if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+              if (mountRef.current && renderer.domElement) {
+                mountRef.current.removeChild(renderer.domElement);
+              }
+              renderer.dispose();
+            };
+          }, [rotation, speed, showLabels, colorScheme]);
+
+          return (
+            <div className="w-full h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex flex-col">
+              <div className="bg-slate-800/90 backdrop-blur-sm p-4 shadow-2xl border-b border-slate-700">
+                <div className="flex items-center justify-between mb-3">
+                  <button 
+                    onClick={onBack}
+                    className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all font-medium"
+                  >
+                    ← Back to Home
+                  </button>
+                  <h1 className="text-3xl font-bold text-white text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Interactive 3D DNA Double Helix
+                  </h1>
+                  <div className="w-32"></div>
+                </div>
+                
+                <div className="flex flex-wrap gap-3 justify-center items-center mb-3">
+                  <button onClick={() => setRotation(!rotation)} className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-blue-500/50 font-medium">
+                    {rotation ? '⏸ Pause' : '▶ Rotate'}
+                  </button>
+                  
+                  <div className="flex items-center gap-2 bg-slate-700/50 px-4 py-2 rounded-lg">
+                    <label className="text-white text-sm font-medium">Speed:</label>
+                    <input type="range" min="0.001" max="0.015" step="0.001" value={speed} onChange={(e) => setSpeed(parseFloat(e.target.value))} className="w-32 accent-blue-500" />
+                  </div>
+                  
+                  <button onClick={() => setShowLabels(!showLabels)} className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-lg hover:from-green-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-green-500/50 font-medium">
+                    {showLabels ? '🏷️ Labels ON' : '🏷️ Labels OFF'}
+                  </button>
+                  
+                  <select value={colorScheme} onChange={(e) => setColorScheme(e.target.value)} className="px-4 py-2.5 bg-slate-700 text-white rounded-lg border border-slate-600 hover:bg-slate-600 transition-all font-medium cursor-pointer">
+                    <option value="vibrant">🎨 Vibrant</option>
+                    <option value="neon">✨ Neon</option>
+                    <option value="professional">💼 Professional</option>
+                  </select>
+                </div>
+                
+                <div className="flex flex-wrap gap-4 justify-center text-sm">
+                  <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                    <span className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50"></span>
+                    <span className="text-white font-medium">Adenine (A)</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                    <span className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/50"></span>
+                    <span className="text-white font-medium">Thymine (T)</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                    <span className="w-3 h-3 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50"></span>
+                    <span className="text-white font-medium">Cytosine (C)</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                    <span className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/50"></span>
+                    <span className="text-white font-medium">Guanine (G)</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                    <span className="w-3 h-3 rounded-full bg-slate-400"></span>
+                    <span className="text-white font-medium">Sugar-Phosphate Backbone</span>
+                  </div>
+                </div>
+                
+                <p className="text-center text-slate-400 text-sm mt-3 font-medium">
+                  🖱️ Move mouse to rotate • 🔄 Scroll to zoom • Base pairs: A↔T (2 bonds), C↔G (3 bonds)
+                </p>
+              </div>
+              
+              <div ref={mountRef} className="flex-1" />
+            </div>
+          );
+        };
+
+        const RNA3DModel = ({ onBack }) => {
+            const containerRef = useRef(null);
+            const sceneRef = useRef(null);
+            const cameraRef = useRef(null);
+            const rendererRef = useRef(null);
+            const rnaGroupRef = useRef(null);
+            const animationFrameRef = useRef(null);
+            const [isRotating, setIsRotating] = useState(true);
+
+            useEffect(() => {
+                if (!containerRef.current) return;
+
+                let scene, camera, renderer, rnaGroup;
+                let controls = {
+                    mouseDown: false,
+                    mouseX: 0,
+                    mouseY: 0,
+                    rotationX: 0,
+                    rotationY: 0
+                };
+
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x0a0a1a);
+                scene.fog = new THREE.Fog(0x0a0a1a, 50, 150);
+                sceneRef.current = scene;
+
+                camera = new THREE.PerspectiveCamera(75, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
+                camera.position.set(30, 15, 50);
+                camera.lookAt(0, 0, 0);
+                cameraRef.current = camera;
+
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                containerRef.current.appendChild(renderer.domElement);
+                rendererRef.current = renderer;
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+                scene.add(ambientLight);
+
+                const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                mainLight.position.set(10, 10, 10);
+                mainLight.castShadow = true;
+                scene.add(mainLight);
+
+                const fillLight1 = new THREE.DirectionalLight(0x4ecdc4, 0.3);
+                fillLight1.position.set(-10, 5, -5);
+                scene.add(fillLight1);
+
+                const fillLight2 = new THREE.DirectionalLight(0xff6b6b, 0.2);
+                fillLight2.position.set(5, -5, 10);
+                scene.add(fillLight2);
+
+                const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                rimLight.position.set(0, 10, -10);
+                scene.add(rimLight);
+
+                const pointLight1 = new THREE.PointLight(0x00d4ff, 0.5, 100);
+                pointLight1.position.set(20, 0, 0);
+                scene.add(pointLight1);
+
+                const pointLight2 = new THREE.PointLight(0xff6b6b, 0.3, 100);
+                pointLight2.position.set(-20, 0, 0);
+                scene.add(pointLight2);
+
+                rnaGroup = new THREE.Group();
+                const baseSequence = ['A', 'U', 'G', 'C', 'A', 'G', 'U', 'C', 'G', 'A', 'U', 'C', 'G', 'A', 'U', 'G', 'C', 'A'];
+                const baseColors = {
+                    'A': 0xff6b6b,
+                    'U': 0x4ecdc4,
+                    'G': 0x95e1d3,
+                    'C': 0xf38181
+                };
+
+                const radius = 8;
+                const height = 45;
+                const numBases = baseSequence.length;
+                const turnHeight = height / (numBases - 1);
+
+                const backboneMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xffd93d,
+                    shininess: 80,
+                    specular: 0xffff88,
+                    emissive: 0x443300,
+                    emissiveIntensity: 0.1
+                });
+
+                const bondMaterial = new THREE.MeshPhongMaterial({
+                    color: 0xcccccc,
+                    shininess: 60,
+                    transparent: true,
+                    opacity: 0.8
+                });
+
+                for (let i = 0; i < numBases; i++) {
+                    const angle = (i / numBases) * Math.PI * 5;
+                    const y = -height/2 + i * turnHeight;
+                    const x = Math.cos(angle) * radius;
+                    const z = Math.sin(angle) * radius;
+
+                    const sugarGroup = new THREE.Group();
+                    const sugarGeometry = new THREE.SphereGeometry(1, 32, 32);
+                    const sugar = new THREE.Mesh(sugarGeometry, backboneMaterial);
+                    sugarGroup.add(sugar);
+                    
+                    for (let j = 0; j < 5; j++) {
+                        const smallSphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.15, 16, 16),
+                            new THREE.MeshPhongMaterial({ color: 0xffbb33, shininess: 100 })
+                        );
+                        const smallAngle = (j / 5) * Math.PI * 2;
+                        smallSphere.position.set(
+                            Math.cos(smallAngle) * 0.6,
+                            Math.sin(smallAngle) * 0.6,
+                            0
+                        );
+                        sugarGroup.add(smallSphere);
+                    }
+                    
+                    sugarGroup.position.set(x, y, z);
+                    rnaGroup.add(sugarGroup);
+
+                    const phosphateGroup = new THREE.Group();
+                    const phosphateGeometry = new THREE.SphereGeometry(0.7, 32, 32);
+                    const phosphateMaterial = new THREE.MeshPhongMaterial({
+                        color: 0xff9933,
+                        shininess: 90,
+                        specular: 0xffaa44
+                    });
+                    const phosphate = new THREE.Mesh(phosphateGeometry, phosphateMaterial);
+                    phosphateGroup.add(phosphate);
+                    
+                    for (let j = 0; j < 4; j++) {
+                        const oxygen = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.2, 16, 16),
+                            new THREE.MeshPhongMaterial({ color: 0xff0000, shininess: 100 })
+                        );
+                        const oxyAngle = (j / 4) * Math.PI * 2;
+                        oxygen.position.set(
+                            Math.cos(oxyAngle) * 0.5,
+                            Math.sin(oxyAngle) * 0.5,
+                            0
+                        );
+                        phosphateGroup.add(oxygen);
+                    }
+                    
+                    const phosphateAngle = angle + 0.3;
+                    phosphateGroup.position.set(
+                        Math.cos(phosphateAngle) * (radius + 0.8),
+                        y + turnHeight/2,
+                        Math.sin(phosphateAngle) * (radius + 0.8)
+                    );
+                    rnaGroup.add(phosphateGroup);
+
+                    if (i < numBases - 1) {
+                        const nextAngle = ((i + 1) / numBases) * Math.PI * 5;
+                        const nextY = -height/2 + (i + 1) * turnHeight;
+                        const nextX = Math.cos(nextAngle) * radius;
+                        const nextZ = Math.sin(nextAngle) * radius;
+
+                        const distance = Math.sqrt(
+                            Math.pow(nextX - x, 2) + 
+                            Math.pow(nextY - y, 2) + 
+                            Math.pow(nextZ - z, 2)
+                        );
+                        
+                        const bondGeometry = new THREE.CylinderGeometry(0.2, 0.2, distance);
+                        const bond = new THREE.Mesh(bondGeometry, bondMaterial);
+                        
+                        bond.position.set((x + nextX)/2, (y + nextY)/2, (z + nextZ)/2);
+                        const direction = new THREE.Vector3(nextX - x, nextY - y, nextZ - z);
+                        const axis = new THREE.Vector3(0, 1, 0);
+                        bond.quaternion.setFromUnitVectors(axis, direction.normalize());
+                        
+                        rnaGroup.add(bond);
+                    }
+
+                    const base = baseSequence[i];
+                    const baseColor = baseColors[base];
+                    const baseMaterial = new THREE.MeshPhongMaterial({ 
+                        color: baseColor,
+                        shininess: 70,
+                        specular: 0xffffff,
+                        emissive: baseColor,
+                        emissiveIntensity: 0.15
+                    });
+
+                    const baseGroup = new THREE.Group();
+                    
+                    let baseGeometry;
+                    if (base === 'A' || base === 'G') {
+                        baseGeometry = new THREE.BoxGeometry(2.5, 2, 0.6);
+                        const ring1 = new THREE.Mesh(
+                            new THREE.TorusGeometry(0.6, 0.15, 16, 32),
+                            baseMaterial
+                        );
+                        ring1.position.set(-0.4, 0, 0);
+                        baseGroup.add(ring1);
+                        
+                        const ring2 = new THREE.Mesh(
+                            new THREE.TorusGeometry(0.5, 0.15, 16, 32),
+                            baseMaterial
+                        );
+                        ring2.position.set(0.4, 0, 0);
+                        baseGroup.add(ring2);
+                    } else {
+                        baseGeometry = new THREE.BoxGeometry(2, 1.8, 0.6);
+                        const ring = new THREE.Mesh(
+                            new THREE.TorusGeometry(0.6, 0.15, 16, 32),
+                            baseMaterial
+                        );
+                        baseGroup.add(ring);
+                    }
+
+                    const baseMesh = new THREE.Mesh(baseGeometry, baseMaterial);
+                    baseGroup.add(baseMesh);
+
+                    const baseAngle = angle + Math.PI;
+                    const baseRadius = radius - 3.5;
+                    baseGroup.position.set(
+                        Math.cos(baseAngle) * baseRadius,
+                        y,
+                        Math.sin(baseAngle) * baseRadius
+                    );
+                    baseGroup.lookAt(x, y, z);
+                    rnaGroup.add(baseGroup);
+
+                    const baseBondDistance = 3.5;
+                    const baseBondGeometry = new THREE.CylinderGeometry(0.15, 0.15, baseBondDistance);
+                    const baseBond = new THREE.Mesh(baseBondGeometry, bondMaterial);
+                    baseBond.position.set(
+                        (x + baseGroup.position.x)/2,
+                        y,
+                        (z + baseGroup.position.z)/2
+                    );
+                    const baseBondDirection = new THREE.Vector3(
+                        baseGroup.position.x - x,
+                        0,
+                        baseGroup.position.z - z
+                    );
+                    const yAxis = new THREE.Vector3(0, 1, 0);
+                    baseBond.quaternion.setFromUnitVectors(yAxis, baseBondDirection.normalize());
+                    rnaGroup.add(baseBond);
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = 256;
+                    canvas.height = 256;
+                    
+                    const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+                    gradient.addColorStop(0, `rgba(${(baseColor >> 16) & 255}, ${(baseColor >> 8) & 255}, ${baseColor & 255}, 0.9)`);
+                    gradient.addColorStop(1, `rgba(${(baseColor >> 16) & 255}, ${(baseColor >> 8) & 255}, ${baseColor & 255}, 0.3)`);
+                    
+                    context.fillStyle = gradient;
+                    context.beginPath();
+                    context.arc(128, 128, 100, 0, Math.PI * 2);
+                    context.fill();
+                    
+                    context.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    context.lineWidth = 4;
+                    context.beginPath();
+                    context.arc(128, 128, 100, 0, Math.PI * 2);
+                    context.stroke();
+                    
+                    context.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                    context.shadowBlur = 10;
+                    context.shadowOffsetX = 3;
+                    context.shadowOffsetY = 3;
+                    
+                    context.fillStyle = 'white';
+                    context.font = 'Bold 120px Arial';
+                    context.textAlign = 'center';
+                    context.textBaseline = 'middle';
+                    context.fillText(base, 128, 128);
+                    
+                    context.shadowColor = 'transparent';
+                    context.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    context.font = 'Bold 120px Arial';
+                    context.fillText(base, 126, 126);
+                    
+                    const texture = new THREE.CanvasTexture(canvas);
+                    texture.needsUpdate = true;
+                    
+                    const spriteMaterial = new THREE.SpriteMaterial({ 
+                        map: texture,
+                        transparent: true,
+                        opacity: 0.95,
+                        depthTest: true
+                    });
+                    const sprite = new THREE.Sprite(spriteMaterial);
+                    
+                    sprite.position.set(baseGroup.position.x * 0.85, y, baseGroup.position.z * 0.85);
+                    sprite.scale.set(3, 3, 1);
+                    
+                    rnaGroup.add(sprite);
+                }
+
+                scene.add(rnaGroup);
+                rnaGroupRef.current = rnaGroup;
+
+                const onMouseDown = (event) => {
+                    controls.mouseDown = true;
+                    controls.mouseX = event.clientX;
+                    controls.mouseY = event.clientY;
+                };
+
+                const onMouseMove = (event) => {
+                    if (controls.mouseDown) {
+                        const deltaX = event.clientX - controls.mouseX;
+                        const deltaY = event.clientY - controls.mouseY;
+
+                        controls.rotationY += deltaX * 0.005;
+                        controls.rotationX += deltaY * 0.005;
+
+                        rnaGroup.rotation.y = controls.rotationY;
+                        rnaGroup.rotation.x = controls.rotationX;
+
+                        controls.mouseX = event.clientX;
+                        controls.mouseY = event.clientY;
+                    }
+                };
+
+                const onMouseUp = () => {
+                    controls.mouseDown = false;
+                };
+
+                const onWheel = (event) => {
+                    event.preventDefault();
+                    camera.position.z += event.deltaY * 0.05;
+                    camera.position.z = Math.max(20, Math.min(100, camera.position.z));
+                };
+
+                const onWindowResize = () => {
+                    if (!containerRef.current) return;
+                    camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+                };
+
+                document.addEventListener('mousedown', onMouseDown);
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                document.addEventListener('wheel', onWheel);
+                window.addEventListener('resize', onWindowResize);
+
+                const animate = () => {
+                    animationFrameRef.current = requestAnimationFrame(animate);
+
+                    if (isRotating && !controls.mouseDown) {
+                        rnaGroup.rotation.y += 0.003;
+                    }
+
+                    renderer.render(scene, camera);
+                };
+
+                animate();
+
+                return () => {
+                    document.removeEventListener('mousedown', onMouseDown);
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    document.removeEventListener('wheel', onWheel);
+                    window.removeEventListener('resize', onWindowResize);
+                    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+                    if (containerRef.current && renderer.domElement) {
+                        containerRef.current.removeChild(renderer.domElement);
+                    }
+                    renderer.dispose();
+                };
+            }, [isRotating]);
+
+            const toggleRotation = () => {
+                setIsRotating(!isRotating);
+            };
+
+            const resetView = () => {
+                if (cameraRef.current && rnaGroupRef.current) {
+                    cameraRef.current.position.set(30, 15, 50);
+                    cameraRef.current.lookAt(0, 0, 0);
+                    rnaGroupRef.current.rotation.set(0, 0, 0);
+                }
+            };
+
+            return (
+                <div className="w-full h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+                    <div className="bg-slate-800/90 backdrop-blur-sm p-4 shadow-2xl border-b border-slate-700">
+                        <div className="flex items-center justify-between mb-3">
+                            <button 
+                                onClick={onBack}
+                                className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all font-medium"
+                            >
+                                ← Back to Home
+                            </button>
+                            <h1 className="text-3xl font-bold text-white text-center bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                                Interactive 3D RNA Structure
+                            </h1>
+                            <div className="w-32"></div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-3 justify-center items-center mb-3">
+                            <button 
+                                onClick={toggleRotation}
+                                className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-lg hover:from-cyan-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-cyan-500/50 font-medium"
+                            >
+                                {isRotating ? '⏸ Pause' : '▶ Rotate'}
+                            </button>
+                            <button 
+                                onClick={resetView}
+                                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-purple-500/50 font-medium"
+                            >
+                                🔄 Reset View
+                            </button>
+                        </div>
+
+                        <div className="flex flex-wrap gap-4 justify-center text-sm">
+                            <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                                <span className="w-3 h-3 rounded-full bg-red-400 shadow-lg shadow-red-400/50"></span>
+                                <span className="text-white font-medium">Adenine (A)</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                                <span className="w-3 h-3 rounded-full bg-cyan-400 shadow-lg shadow-cyan-400/50"></span>
+                                <span className="text-white font-medium">Uracil (U)</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                                <span className="w-3 h-3 rounded-full bg-teal-300 shadow-lg shadow-teal-300/50"></span>
+                                <span className="text-white font-medium">Guanine (G)</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                                <span className="w-3 h-3 rounded-full bg-pink-400 shadow-lg shadow-pink-400/50"></span>
+                                <span className="text-white font-medium">Cytosine (C)</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg">
+                                <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
+                                <span className="text-white font-medium">Sugar-Phosphate Backbone</span>
+                            </div>
+                        </div>
+
+                        <p className="text-center text-slate-400 text-sm mt-3 font-medium">
+                            🖱️ Drag to rotate • 🔄 Scroll to zoom • Single-stranded helix with Uracil instead of Thymine
+                        </p>
+                    </div>
+
+                    <div ref={containerRef} className="flex-1" />
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [currentView, setCurrentView] = useState('landing');
+
+            return (
+                <>
+                    {currentView === 'landing' && (
+                        <LandingPage onSelectModel={setCurrentView} />
+                    )}
+                    {currentView === 'dna' && (
+                        <DNA3DModel onBack={() => setCurrentView('landing')} />
+                    )}
+                    {currentView === 'rna' && (
+                        <RNA3DModel onBack={() => setCurrentView('landing')} />
+                    )}
+                </>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
